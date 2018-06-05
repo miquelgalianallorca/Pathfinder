@@ -1,12 +1,15 @@
 #include <stdafx.h>
 
 #include "pathfinder.h"
+#include "path.h"
 
 Pathfinder::Pathfinder() : MOAIEntity2D()
 {
 	RTTI_BEGIN
 		RTTI_EXTEND(MOAIEntity2D)
 	RTTI_END
+
+	path.Load("../sample/path.txt", 5, 10);
 }
 
 Pathfinder::~Pathfinder()
@@ -14,9 +17,10 @@ Pathfinder::~Pathfinder()
 
 }
 
+// Calculates path
 void Pathfinder::UpdatePath()
 {
-
+	
 }
 
 void Pathfinder::DrawDebug()
@@ -24,9 +28,9 @@ void Pathfinder::DrawDebug()
 
 }
 
+// Returns true if pathfinding process finished
 bool Pathfinder::PathfindStep()
 {
-    // returns true if pathfinding process finished
     return true;
 }
 

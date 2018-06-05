@@ -2,6 +2,7 @@
 #define __PATHFINDER_H__
 
 #include <moaicore/MOAIEntity2D.h>
+#include "path.h"
 
 class Pathfinder: public virtual MOAIEntity2D
 {
@@ -11,17 +12,20 @@ public:
 
 	virtual void DrawDebug();
 
-	void SetStartPosition(float x, float y) { m_StartPosition = USVec2D(x, y); UpdatePath();}
-	void SetEndPosition(float x, float y) { m_EndPosition = USVec2D(x, y); UpdatePath();}
-	const USVec2D& GetStartPosition() const { return m_StartPosition;}
-	const USVec2D& GetEndPosition() const { return m_EndPosition;}
+	void SetStartPosition(float x, float y) { m_StartPosition = USVec2D(x, y); UpdatePath(); }
+	void SetEndPosition  (float x, float y) { m_EndPosition   = USVec2D(x, y); UpdatePath(); }
+	const USVec2D& GetStartPosition() const { return m_StartPosition; }
+	const USVec2D& GetEndPosition()   const { return m_EndPosition;   }
 
     bool PathfindStep();
+
 private:
 	void UpdatePath();
-private:
+
 	USVec2D m_StartPosition;
 	USVec2D m_EndPosition;
+
+	Path path;
 
 	// Lua configuration
 public:
