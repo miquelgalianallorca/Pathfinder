@@ -25,7 +25,10 @@ private:
 	USVec2D m_StartPosition;
 	USVec2D m_EndPosition;
 
-	Path path;
+	// My vars ===========================================
+	Path   path;       // Map and nodes
+	size_t squareSize; // Map coords to pixel coords
+	// ===================================================
 
 	// Lua configuration
 public:
