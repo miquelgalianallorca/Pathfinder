@@ -27,10 +27,12 @@ public:
 
 	void DrawDebug(const size_t& squareSize);
 
-private:
 	void CoordToWorldPos(const unsigned int InPosX, const unsigned int InPosY, const size_t squareSize,
 		float& OutPosX, float& OutPosY);
+	void WorldPosToCoord(const float InPosX, const float InPosY, const size_t squareSize, 
+		unsigned int& OutPosX, unsigned int& OutPosY);
 
+private:
 	unsigned int rows, cols;
 	std::string mapSrc;
 	std::vector<Node> nodes;

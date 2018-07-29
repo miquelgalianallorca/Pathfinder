@@ -44,7 +44,7 @@ void Path::DrawDebug(const size_t& squareSize)
 		if (node.cost > 0)
 		{
 			float alpha = (node.cost) / 10.f;
-			gfxDevice.SetPenColor(1.f, 0.f, 0.f, .1f);
+			gfxDevice.SetPenColor(alpha + .3f, 0.f, 0.f, .1f);
 
 			float wPosX, wPosY;
 			CoordToWorldPos(node.posX, node.posY, squareSize, wPosX, wPosY);
@@ -62,4 +62,14 @@ void Path::CoordToWorldPos(const unsigned int InPosX, const unsigned int InPosY,
 
 	OutPosX = offsetX + static_cast<float>(InPosX) * squareSize * 2;
 	OutPosY = offsetY + static_cast<float>(InPosY) * squareSize * 2;
+}
+
+void Path::WorldPosToCoord(const float InPosX, const float InPosY, const size_t squareSize,
+	unsigned int& OutPosX, unsigned int& OutPosY)
+{
+	float offsetX = -1.f * squareSize * GetCols();
+	float offsetY = -1.f * squareSize * GetRows();
+
+	OutPosX = static_cast<unsigned int>((InPosX - offsetX) / (squareSize * 2));
+	OutPosY = static_cast<unsigned int>((InPosY - offsetY) / (squareSize * 2));
 }
