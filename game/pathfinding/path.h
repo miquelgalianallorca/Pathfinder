@@ -2,6 +2,13 @@
 
 struct Node
 {
+	Node() {}
+	Node(unsigned int _posX, unsigned int _posY, unsigned int _cost) :
+		posX(_posX),
+		posY(_posY),
+		cost(_cost)
+	{}
+
 	unsigned int posX;
 	unsigned int posY;   // Map grid location
 	int cost;            // Traverse cost of grid location
@@ -36,4 +43,10 @@ private:
 	unsigned int rows, cols;
 	std::string mapSrc;
 	std::vector<Node> nodes;
+	
+	static bool OrderByShortest(const Node& first, const Node& second)
+	{
+		return (first.cost < second.cost);
+	}
+	std::list<Node> GetConnections(const std::list<Node>& list, unsigned int posX, unsigned int posY);
 };

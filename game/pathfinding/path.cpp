@@ -30,9 +30,62 @@ void Path::Load(const std::string& filename, const unsigned int rows, const unsi
 // Heuristics: Euclidean distance. Manhattan could give longer paths than necessary.
 bool Path::AStar(const float startX, const float startY, const float endX, const float endY)
 {
+	/*
+	openlist
+	closedlist
+	add nodeInicio a openlist, coste 0
+	while not openlist.vacio
+		nodo = openlist.pop_shortest()
+		if isGoal(nodo)
+			return buildPath(nodo)
+		else
+			for nextNode : conexiones(node)
+				if nextNode in closedlist
+					continue
+				if nextNode in openlist
+					update cost in openlist if smaller
+				else
+					add to openlist con padre node
 
 
-	return true;
+	buildPath(pathnode)
+		while(padre(pathNode))
+			add node(pathNode) to path
+		return path
+	*/
+
+	std::list<Node> openList;
+	std::list<Node> closedList;
+
+	openList.push_back(Node(static_cast<unsigned int>(startX), static_cast<unsigned int>(startY), 0));/*
+	openList.push_back(Node(static_cast<unsigned int>(startX), static_cast<unsigned int>(startY), 2));
+	openList.push_back(Node(static_cast<unsigned int>(startX), static_cast<unsigned int>(startY), 1));*/
+
+	while (openList.size() > 0)
+	{
+		// Order by shortest
+		openList.sort(Path::OrderByShortest);
+		// Get shortest
+		Node node = openList.front();
+		openList.pop_front();
+
+		// Check goal
+		if (node.posX == endX && node.posY == endY)
+		{
+			// buildPath
+			// ...
+			return true;
+		}
+
+		// Connections
+		std::list<Node> connections = GetConnections(openList, node.posX, node.posY);
+		for (auto connection : connections)
+		{
+			
+		}
+	}
+
+	return false;
 }
 
 void Path::DrawDebug(const size_t& squareSize)
@@ -72,4 +125,19 @@ void Path::WorldPosToCoord(const float InPosX, const float InPosY, const size_t 
 
 	OutPosX = static_cast<unsigned int>((InPosX - offsetX) / (squareSize * 2));
 	OutPosY = static_cast<unsigned int>((InPosY - offsetY) / (squareSize * 2));
+}
+
+std::list<Node> Path::GetConnections(const std::list<Node>& list, unsigned int posX, unsigned int posY)
+{
+	std::list<Node> connections;
+
+	// Left
+
+	// Right
+
+	// Up
+
+	// Down
+
+	return connections;
 }
