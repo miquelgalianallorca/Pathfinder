@@ -131,13 +131,21 @@ std::list<Node> Path::GetConnections(const std::list<Node>& list, unsigned int p
 {
 	std::list<Node> connections;
 
-	// Left
-
-	// Right
-
-	// Up
-
-	// Down
+	for (auto elem : list)
+	{
+		// Left
+		if (elem.posX == posX - 1 && elem.posY == posY)
+			connections.push_back(elem);
+		// Right
+		else if (elem.posX == posX + 1 && elem.posY == posY)
+			connections.push_back(elem);
+		// Up
+		else if (elem.posX == posX && elem.posY == posY - 1)
+			connections.push_back(elem);
+		// Down
+		else if (elem.posX == posX && elem.posY == posY + 1)
+			connections.push_back(elem);
+	}
 
 	return connections;
 }
