@@ -6,12 +6,21 @@ struct Node
 	Node(unsigned int _posX, unsigned int _posY, unsigned int _cost) :
 		posX(_posX),
 		posY(_posY),
-		cost(_cost)
+		cost(_cost),
+		parent(nullptr)
 	{}
+
+	friend bool operator==(const Node& lhs, const Node& rhs)
+	{ 
+		if (lhs.posX == rhs.posX)
+			return true;
+		else return false;
+	}
 
 	unsigned int posX;
 	unsigned int posY;   // Map grid location
-	int cost;            // Traverse cost of grid location
+	int   cost;          // Traverse cost of grid location
+	Node* parent;
 	
 	float g;  // Cost from origin to pos
 	float f;  // f = g + h, h = Estimated cost from pos to goal

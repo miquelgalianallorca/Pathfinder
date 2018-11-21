@@ -2,6 +2,11 @@
 #include <algorithm>
 #include "path.h"
 
+//void Node::operator==(const Node& lhs, const Node& rhs)
+//{
+//
+//}
+
 void Path::Load(const std::string& filename, const unsigned int rows, const unsigned int cols)
 {
 	this->rows = rows;
@@ -28,6 +33,7 @@ void Path::Load(const std::string& filename, const unsigned int rows, const unsi
 }
 
 // Heuristics: Euclidean distance. Manhattan could give longer paths than necessary.
+// Start and end in map coords (not in screen coords)
 bool Path::AStar(const float startX, const float startY, const float endX, const float endY)
 {
 	/*
@@ -57,9 +63,7 @@ bool Path::AStar(const float startX, const float startY, const float endX, const
 	std::list<Node> openList;
 	std::list<Node> closedList;
 
-	openList.push_back(Node(static_cast<unsigned int>(startX), static_cast<unsigned int>(startY), 0));/*
-	openList.push_back(Node(static_cast<unsigned int>(startX), static_cast<unsigned int>(startY), 2));
-	openList.push_back(Node(static_cast<unsigned int>(startX), static_cast<unsigned int>(startY), 1));*/
+	openList.push_back(Node(static_cast<unsigned int>(startX), static_cast<unsigned int>(startY), 0));
 
 	while (openList.size() > 0)
 	{
@@ -74,14 +78,38 @@ bool Path::AStar(const float startX, const float startY, const float endX, const
 		{
 			// buildPath
 			// ...
+			cout << "End path." << endl;
 			return true;
 		}
 
 		// Connections
 		std::list<Node> connections = GetConnections(openList, node.posX, node.posY);
-		for (auto connection : connections)
+		for (auto next : connections)
 		{
-			
+			auto it = std::find(closedList.begin(), closedList.end(), next);
+			// Connection is in closed list
+			if (it != closedList.end())
+			{
+				continue;
+			}
+
+			// Connection is in open list
+			it = std::find(openList.begin(), openList.end(), next);
+			if (it != openList.end())
+			{
+				// Update cost in open list if smaller
+				int newCost = node.cost + next.cost;
+				if (newCost < it->cost)
+				{
+					it->cost = newCost;
+				}
+			}
+			// Add to openlist with node as parent
+			else
+			{
+				it->parent = new Node(node);
+				openList.push_back(*it);
+			}
 		}
 	}
 
@@ -131,7 +159,7 @@ std::list<Node> Path::GetConnections(const std::list<Node>& list, unsigned int p
 {
 	std::list<Node> connections;
 
-	for (auto elem : list)
+	for (auto elem : nodes)
 	{
 		// Left
 		if (elem.posX == posX - 1 && elem.posY == posY)

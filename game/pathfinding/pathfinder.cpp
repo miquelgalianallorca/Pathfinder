@@ -18,7 +18,6 @@ Pathfinder::Pathfinder() : MOAIEntity2D()
 
 Pathfinder::~Pathfinder()
 {
-
 }
 
 // Calculates path
@@ -29,9 +28,9 @@ void Pathfinder::UpdatePath()
 	// Mouse position to grid coords
 	unsigned int posX, posY;
 	path.WorldPosToCoord(m_StartPosition.mX, m_StartPosition.mY, squareSize, posX, posY);
-	m_StartPositionCoord = USVec2D(posX, posY);
+	m_StartPositionCoord = USVec2D(static_cast<float>(posX), static_cast<float>(posY));
 	path.WorldPosToCoord(m_EndPosition.mX, m_EndPosition.mY, squareSize, posX, posY);
-	m_EndPositionCoord = USVec2D(posX, posY);
+	m_EndPositionCoord = USVec2D(static_cast<float>(posX), static_cast<float>(posY));
 
 	// A*
 	path.AStar(GetStartPosition().mX, GetStartPosition().mY, GetEndPosition().mX, GetEndPosition().mY);
@@ -46,18 +45,20 @@ void Pathfinder::DrawDebug()
 	// Draw grid
 	USRect rect;
 	rect.mXMin = -1.f * squareSize * path.GetCols();
-	rect.mXMax =        squareSize * path.GetCols();
+	rect.mXMax = static_cast<float>(squareSize * path.GetCols());
 	rect.mYMin = -1.f * squareSize * path.GetRows();
-	rect.mYMax =        squareSize * path.GetRows();
+	rect.mYMax = static_cast<float>(squareSize * path.GetRows());
 	
 	// Draw start pos
 	gfxDevice.SetPenColor(0.f, 1.f, 0.f, 1.f);
 	float posX, posY;
-	path.CoordToWorldPos(m_StartPositionCoord.mX, m_StartPositionCoord.mY, squareSize, posX, posY);
+	path.CoordToWorldPos(static_cast<unsigned int>(m_StartPositionCoord.mX), static_cast<unsigned int>(m_StartPositionCoord.mY),
+		squareSize, posX, posY);
 	MOAIDraw::DrawRectFill(posX, posY, posX + squareSize * 2, posY + squareSize * 2);
 	// Draw end pos
 	gfxDevice.SetPenColor(0.f, 0.f, 1.f, 1.f);
-	path.CoordToWorldPos(m_EndPositionCoord.mX, m_EndPositionCoord.mY, squareSize, posX, posY);
+	path.CoordToWorldPos(static_cast<unsigned int>(m_EndPositionCoord.mX), static_cast<unsigned int>(m_EndPositionCoord.mY),
+		squareSize, posX, posY);
 	MOAIDraw::DrawRectFill(posX, posY, posX + squareSize * 2, posY + squareSize * 2);
 
 	// Draw obstacles
