@@ -6,7 +6,10 @@
 using std::cout;
 using std::endl;
 
-Pathfinder::Pathfinder() : MOAIEntity2D()
+Pathfinder::Pathfinder() :
+	MOAIEntity2D(),
+	IsStartPositionSet(false),
+	IsEndPositionSet(false)
 {
 	RTTI_BEGIN
 		RTTI_EXTEND(MOAIEntity2D)
@@ -23,7 +26,12 @@ Pathfinder::~Pathfinder()
 // Calculates path
 void Pathfinder::UpdatePath()
 {
-	cout << "startPos: " << m_StartPosition.mX << " " << m_StartPosition.mY << endl;
+	// Check if valid path
+	if (!IsStartPositionSet || !IsEndPositionSet)
+	{
+		cout << "Path doesn't have start and end." << endl;
+		return;
+	}
 
 	// Mouse position to grid coords
 	unsigned int posX, posY;
@@ -33,7 +41,9 @@ void Pathfinder::UpdatePath()
 	m_EndPositionCoord = USVec2D(static_cast<float>(posX), static_cast<float>(posY));
 
 	// A*
-	path.AStar(GetStartPosition().mX, GetStartPosition().mY, GetEndPosition().mX, GetEndPosition().mY);
+	// path.AStar(GetStartPosition().mX, GetStartPosition().mY, GetEndPosition().mX, GetEndPosition().mY);
+	path.AStar(m_StartPositionCoord.mX, m_StartPositionCoord.mY,
+		m_EndPositionCoord.mX, m_EndPositionCoord.mY);
 }
 
 void Pathfinder::DrawDebug()
@@ -77,9 +87,19 @@ bool Pathfinder::PathfindStep()
 }
 
 
+void Pathfinder::SetStartPosition(float x, float y)
+{
+	m_StartPosition = USVec2D(x, y);
+	IsStartPositionSet = true;
+	UpdatePath();
+}
 
-
-
+void Pathfinder::SetEndPosition(float x, float y)
+{
+	m_EndPosition = USVec2D(x, y);
+	IsEndPositionSet = true;
+	UpdatePath();
+}
 
 
 

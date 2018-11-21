@@ -2,11 +2,6 @@
 #include <algorithm>
 #include "path.h"
 
-//void Node::operator==(const Node& lhs, const Node& rhs)
-//{
-//
-//}
-
 void Path::Load(const std::string& filename, const unsigned int rows, const unsigned int cols)
 {
 	this->rows = rows;
@@ -24,10 +19,10 @@ void Path::Load(const std::string& filename, const unsigned int rows, const unsi
 	// Get nodes from map
 	for (size_t i = 0; i < mapSrc.length(); ++i)
 	{
-		Node node;
-		node.cost = static_cast<int>(mapSrc.at(i)) - static_cast<int>('0');
-		node.posY = i / cols;
-		node.posX = i % cols;
+		Node* node = new Node();
+		node->cost = static_cast<int>(mapSrc.at(i)) - static_cast<int>('0');
+		node->posY = i / cols;
+		node->posX = i % cols;
 		nodes.push_back(node);
 	}
 }
@@ -53,40 +48,43 @@ bool Path::AStar(const float startX, const float startY, const float endX, const
 				else
 					add to openlist con padre node
 
-
 	buildPath(pathnode)
 		while(padre(pathNode))
 			add node(pathNode) to path
 		return path
 	*/
 
-	std::list<Node> openList;
-	std::list<Node> closedList;
+	cout << "Start: " << startX << " " << startY << endl;
+	cout << "End: "   << endX   << " " << endY   << endl;
+	cout << endl;
+	
+	std::list<Node*> openList;
+	std::list<Node*> closedList;
 
-	openList.push_back(Node(static_cast<unsigned int>(startX), static_cast<unsigned int>(startY), 0));
+	// openList.push_back(Node(static_cast<unsigned int>(startX), static_cast<unsigned int>(startY), 0));
+	openList.push_back(start node);
 
 	while (openList.size() > 0)
 	{
 		// Order by shortest
 		openList.sort(Path::OrderByShortest);
 		// Get shortest
-		Node node = openList.front();
+		Node* node = openList.front();
 		openList.pop_front();
 
 		// Check goal
-		if (node.posX == endX && node.posY == endY)
+		if (node->posX == endX && node->posY == endY)
 		{
-			// buildPath
-			// ...
-			cout << "End path." << endl;
+			BuildPath(node);
 			return true;
 		}
 
 		// Connections
-		std::list<Node> connections = GetConnections(openList, node.posX, node.posY);
-		for (auto next : connections)
+		std::list<Node*> connections = GetConnections(node->posX, node->posY);
+		for (Node* next : connections)
 		{
-			auto it = std::find(closedList.begin(), closedList.end(), next);
+			std::list<Node*>::iterator it = std::find(closedList.begin(), closedList.end(),
+				next);
 			// Connection is in closed list
 			if (it != closedList.end())
 			{
@@ -98,17 +96,17 @@ bool Path::AStar(const float startX, const float startY, const float endX, const
 			if (it != openList.end())
 			{
 				// Update cost in open list if smaller
-				int newCost = node.cost + next.cost;
-				if (newCost < it->cost)
+				int newCost = node->cost + next->cost;
+				if (newCost < (*it)->cost)
 				{
-					it->cost = newCost;
+					(*it)->cost = newCost;
 				}
 			}
 			// Add to openlist with node as parent
 			else
 			{
-				it->parent = new Node(node);
-				openList.push_back(*it);
+				next->parent = node;
+				openList.push_back(next);
 			}
 		}
 	}
@@ -120,15 +118,15 @@ void Path::DrawDebug(const size_t& squareSize)
 {
 	MOAIGfxDevice& gfxDevice = MOAIGfxDevice::Get();
 	
-	for (auto node : nodes)
+	for (const Node* node : nodes)
 	{
-		if (node.cost > 0)
+		if (node->cost > 0)
 		{
-			float alpha = (node.cost) / 10.f;
+			float alpha = (node->cost) / 10.f;
 			gfxDevice.SetPenColor(alpha + .3f, 0.f, 0.f, .1f);
 
 			float wPosX, wPosY;
-			CoordToWorldPos(node.posX, node.posY, squareSize, wPosX, wPosY);
+			CoordToWorldPos(node->posX, node->posY, squareSize, wPosX, wPosY);
 			MOAIDraw::DrawRectFill(wPosX, wPosY, wPosX + squareSize*2, wPosY + squareSize*2);
 		}
 	}
@@ -155,25 +153,43 @@ void Path::WorldPosToCoord(const float InPosX, const float InPosY, const size_t 
 	OutPosY = static_cast<unsigned int>((InPosY - offsetY) / (squareSize * 2));
 }
 
-std::list<Node> Path::GetConnections(const std::list<Node>& list, unsigned int posX, unsigned int posY)
+std::list<Node*> Path::GetConnections(unsigned int posX, unsigned int posY)
 {
-	std::list<Node> connections;
-
-	for (auto elem : nodes)
+	// cout << "Get connections of: " << posX << " " << posY;
+	std::list<Node*> connections;
+	for (Node* elem : nodes)
 	{
+		// cout << "Elem x: " << elem.posX << " y: " << elem.posY << endl;
+
 		// Left
-		if (elem.posX == posX - 1 && elem.posY == posY)
+		if (elem->posX == posX - 1 && elem->posY == posY)
 			connections.push_back(elem);
 		// Right
-		else if (elem.posX == posX + 1 && elem.posY == posY)
+		else if (elem->posX == posX + 1 && elem->posY == posY)
 			connections.push_back(elem);
 		// Up
-		else if (elem.posX == posX && elem.posY == posY - 1)
+		else if (elem->posX == posX && elem->posY == posY - 1)
 			connections.push_back(elem);
 		// Down
-		else if (elem.posX == posX && elem.posY == posY + 1)
+		else if (elem->posX == posX && elem->posY == posY + 1)
 			connections.push_back(elem);
 	}
 
+	// cout << endl;
+
 	return connections;
+}
+
+void Path::BuildPath(Node* node)
+{
+	cout << "Building path..." << endl;
+
+	std::list<Node*> path;
+	while (node->parent != nullptr)
+	{
+		path.push_back(node);
+		node = node->parent;
+	}
+
+	cout << "Path built." << endl;
 }

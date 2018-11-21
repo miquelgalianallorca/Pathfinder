@@ -12,7 +12,7 @@ struct Node
 
 	friend bool operator==(const Node& lhs, const Node& rhs)
 	{ 
-		if (lhs.posX == rhs.posX)
+		if (lhs.posX == rhs.posX && lhs.posY == rhs.posY)
 			return true;
 		else return false;
 	}
@@ -36,7 +36,8 @@ public:
 	
 	void Load(const std::string& filename, const unsigned int rows, const unsigned int cols);
 	bool AStar(const float startX, const float startY, const float endX, const float endY);
-	
+	void BuildPath(Node* node);
+
 	std::string  GetMap()  const { return mapSrc; }
 	unsigned int GetRows() const { return rows;   }
 	unsigned int GetCols() const { return cols;   }
@@ -51,11 +52,11 @@ public:
 private:
 	unsigned int rows, cols;
 	std::string mapSrc;
-	std::vector<Node> nodes;
+	std::vector<Node*> nodes;
 	
 	static bool OrderByShortest(const Node& first, const Node& second)
 	{
 		return (first.cost < second.cost);
 	}
-	std::list<Node> GetConnections(const std::list<Node>& list, unsigned int posX, unsigned int posY);
+	std::list<Node*> GetConnections(unsigned int posX, unsigned int posY);
 };

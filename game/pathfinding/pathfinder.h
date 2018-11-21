@@ -12,8 +12,8 @@ public:
 
 	virtual void DrawDebug();
 
-	void SetStartPosition(float x, float y) { m_StartPosition = USVec2D(x, y); UpdatePath(); }
-	void SetEndPosition  (float x, float y) { m_EndPosition   = USVec2D(x, y); UpdatePath(); }
+	void SetStartPosition(float x, float y);
+	void SetEndPosition(float x, float y);
 	const USVec2D& GetStartPosition() const { return m_StartPosition; }
 	const USVec2D& GetEndPosition()   const { return m_EndPosition;   }
 
@@ -31,6 +31,9 @@ private:
 	
 	USVec2D m_StartPositionCoord;
 	USVec2D m_EndPositionCoord;
+
+	bool IsStartPositionSet;
+	bool IsEndPositionSet;
 	// ===================================================
 
 	// Lua configuration
