@@ -2,11 +2,26 @@
 #include <algorithm>
 #include "path.h"
 
+Path::~Path()
+{
+	for (Node* node : nodes)
+		delete node;
+	nodes.clear();
+	path.clear();
+}
+
 void Path::Load(const std::string& filename, const unsigned int rows, const unsigned int cols)
 {
 	this->rows = rows;
 	this->cols = cols;
 
+	// Clear previous nodes
+	for (Node* node : nodes)
+	{
+		delete node;
+	}
+	nodes.clear();
+	
 	// Read file
 	std::ifstream istream(filename, std::ios_base::binary);
 	std::stringstream sstream;
@@ -23,7 +38,18 @@ void Path::Load(const std::string& filename, const unsigned int rows, const unsi
 		node->cost = static_cast<int>(mapSrc.at(i)) - static_cast<int>('0');
 		node->posY = i / cols;
 		node->posX = i % cols;
+		node->parent = nullptr;
 		nodes.push_back(node);
+	}
+}
+
+void Path::ResetNodes()
+{
+	for (Node* node : nodes)
+	{
+		node->parent = nullptr;
+		node->g = 0.f;
+		node->f = 0.f;
 	}
 }
 
@@ -31,6 +57,8 @@ void Path::Load(const std::string& filename, const unsigned int rows, const unsi
 // Start and end in map coords (not in screen coords)
 bool Path::AStar(const float startX, const float startY, const float endX, const float endY)
 {
+	ResetNodes();
+
 	/*
 	openlist
 	closedlist
@@ -62,7 +90,9 @@ bool Path::AStar(const float startX, const float startY, const float endX, const
 	std::list<Node*> closedList;
 
 	// openList.push_back(Node(static_cast<unsigned int>(startX), static_cast<unsigned int>(startY), 0));
-	openList.push_back(start node);
+	Node* startNode = GetNodeAtPosition(static_cast<unsigned int>(startX),
+		static_cast<unsigned int>(startY));
+	openList.push_back(startNode);
 
 	while (openList.size() > 0)
 	{
@@ -83,9 +113,8 @@ bool Path::AStar(const float startX, const float startY, const float endX, const
 		std::list<Node*> connections = GetConnections(node->posX, node->posY);
 		for (Node* next : connections)
 		{
-			std::list<Node*>::iterator it = std::find(closedList.begin(), closedList.end(),
-				next);
 			// Connection is in closed list
+			auto it = std::find(closedList.begin(), closedList.end(), next);
 			if (it != closedList.end())
 			{
 				continue;
@@ -107,6 +136,7 @@ bool Path::AStar(const float startX, const float startY, const float endX, const
 			{
 				next->parent = node;
 				openList.push_back(next);
+				closedList.push_back(node);
 			}
 		}
 	}
@@ -182,14 +212,26 @@ std::list<Node*> Path::GetConnections(unsigned int posX, unsigned int posY)
 
 void Path::BuildPath(Node* node)
 {
-	cout << "Building path..." << endl;
+	path.clear();
 
-	std::list<Node*> path;
+	cout << "Building path..." << endl;
 	while (node->parent != nullptr)
 	{
 		path.push_back(node);
 		node = node->parent;
 	}
-
 	cout << "Path built." << endl;
+}
+
+Node* Path::GetNodeAtPosition(unsigned int posX, unsigned int posY)
+{
+	for (Node* node : nodes)
+	{
+		if (node->posX == posX && node->posY == posY)
+		{
+			return node;
+		}
+	}
+
+	return nullptr;
 }

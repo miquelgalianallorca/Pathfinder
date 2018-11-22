@@ -10,12 +10,12 @@ struct Node
 		parent(nullptr)
 	{}
 
-	friend bool operator==(const Node& lhs, const Node& rhs)
+	/*friend bool operator==(const Node& lhs, const Node& rhs)
 	{ 
 		if (lhs.posX == rhs.posX && lhs.posY == rhs.posY)
 			return true;
 		else return false;
-	}
+	}*/
 
 	unsigned int posX;
 	unsigned int posY;   // Map grid location
@@ -33,6 +33,8 @@ public:
 		rows(0),
 		cols(0)
 	{}
+
+	~Path();
 	
 	void Load(const std::string& filename, const unsigned int rows, const unsigned int cols);
 	bool AStar(const float startX, const float startY, const float endX, const float endY);
@@ -53,10 +55,14 @@ private:
 	unsigned int rows, cols;
 	std::string mapSrc;
 	std::vector<Node*> nodes;
+	std::list<Node*> path;
 	
-	static bool OrderByShortest(const Node& first, const Node& second)
+	static bool OrderByShortest(const Node* first, const Node* second)
 	{
-		return (first.cost < second.cost);
+		return (first->cost < second->cost);
 	}
 	std::list<Node*> GetConnections(unsigned int posX, unsigned int posY);
+
+	Node* GetNodeAtPosition(unsigned int posX, unsigned int posY);
+	void ResetNodes();
 };

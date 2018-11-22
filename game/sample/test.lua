@@ -35,7 +35,7 @@ MOAIDrawDebug.insertEntity(entity)
 
 
 pathfinder = Pathfinder.new()
-pathfinder:setStartPosition(5, 10)
+pathfinder:setStartPosition(5, 10) --5,10
 pathfinder:setEndPosition(20, 40)
 MOAIDrawDebug.insertEntity(pathfinder)
 
