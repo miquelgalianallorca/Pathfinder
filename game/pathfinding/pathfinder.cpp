@@ -86,11 +86,10 @@ void Pathfinder::DrawDebug()
 // Returns true if pathfinding process finished
 bool Pathfinder::PathfindStep()
 {
-	cout << "Pathfind step." << endl;
+	// Single iteration of A* loop
+	// path.AStarStep();
 
-	// Optional P6: do it step by step
-	// ...
-    return true;
+	return true;
 }
 
 void Pathfinder::SetStartPosition(float x, float y)

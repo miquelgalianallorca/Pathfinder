@@ -10,20 +10,13 @@ struct Node
 		parent(nullptr)
 	{}
 
-	/*friend bool operator==(const Node& lhs, const Node& rhs)
-	{ 
-		if (lhs.posX == rhs.posX && lhs.posY == rhs.posY)
-			return true;
-		else return false;
-	}*/
-
 	unsigned int posX;
 	unsigned int posY;   // Map grid location
 	int   cost;          // Traverse cost of grid location
-	Node* parent;
 	
-	float g;  // Cost from origin to pos
-	float f;  // f = g + h, h = Estimated cost from pos to goal
+	Node* parent;	
+	float g;             // Cost from origin to pos
+	float f;             // f = g + h, h = Estimated cost from pos to goal
 };
 
 class Path
@@ -38,6 +31,7 @@ public:
 	
 	void Load(const std::string& filename, const unsigned int rows, const unsigned int cols);
 	bool AStar(const float startX, const float startY, const float endX, const float endY);
+	bool AStarStep();
 	void BuildPath(Node* node);
 
 	std::string  GetMap()  const { return mapSrc; }
@@ -53,11 +47,19 @@ public:
 		unsigned int& OutPosX, unsigned int& OutPosY);
 
 private:
+	// Grid variables
 	unsigned int rows, cols;
 	std::string mapSrc;
 	std::vector<Node*> nodes;
+
+	// A* variables
+	std::list<Node*> openList;
+	std::list<Node*> closedList;
 	std::list<Node*> path;
+	Node* startNode;
+	Node* endNode;
 	
+	// Helper functions ----------------------------------------------------
 	static bool OrderByShortest(const Node* first, const Node* second)
 	{
 		return (first->f < second->f);
@@ -65,6 +67,7 @@ private:
 	
 	std::list<Node*> GetConnections(unsigned int posX, unsigned int posY);
 	Node* GetNodeAtPosition(unsigned int posX, unsigned int posY);
-	void ResetNodes();
+	void  ResetNodes();
 	float Heuristics(const Node* next, const Node* goal);
+	// ---------------------------------------------------------------------
 };

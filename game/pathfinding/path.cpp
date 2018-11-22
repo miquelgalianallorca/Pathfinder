@@ -53,14 +53,15 @@ void Path::ResetNodes()
 		node->g = 0.f;
 		node->f = 0.f;
 	}
+
+	openList.clear();
+	closedList.clear();
 }
 
 // Heuristics: Euclidean distance. Manhattan could give longer paths than necessary.
 // Start and end in map coords (not in screen coords)
 bool Path::AStar(const float startX, const float startY, const float endX, const float endY)
-{
-	ResetNodes();
-
+{	
 	/*
 	openlist
 	closedlist
@@ -84,62 +85,64 @@ bool Path::AStar(const float startX, const float startY, const float endX, const
 		return path
 	*/
 
-	cout << "Start: " << startX << " " << startY << endl;
-	cout << "End: "   << endX   << " " << endY   << endl;
-	cout << endl;
-	
-	std::list<Node*> openList;
-	std::list<Node*> closedList;
+	ResetNodes();
 
-	// openList.push_back(Node(static_cast<unsigned int>(startX), static_cast<unsigned int>(startY), 0));
-	Node* startNode = GetNodeAtPosition(static_cast<unsigned int>(startX), static_cast<unsigned int>(startY));
-	Node* endNode   = GetNodeAtPosition(static_cast<unsigned int>(endX),   static_cast<unsigned int>(endY));
+	startNode = GetNodeAtPosition(static_cast<unsigned int>(startX), static_cast<unsigned int>(startY));
+	endNode   = GetNodeAtPosition(static_cast<unsigned int>(endX),   static_cast<unsigned int>(endY));
 	openList.push_back(startNode);
 
 	while (openList.size() > 0)
 	{
-		// Order by shortest
-		openList.sort(Path::OrderByShortest);
-		// Get shortest
-		Node* node = openList.front();
-		openList.pop_front();
-
-		// Check goal
-		if (node->posX == endX && node->posY == endY)
-		{
-			BuildPath(node);
+		bool Step = AStarStep();
+		if (Step)
 			return true;
+	}
+
+	return false;
+}
+
+bool Path::AStarStep()
+{
+	// Get shortest
+	openList.sort(Path::OrderByShortest);
+	Node* node = openList.front();
+	openList.pop_front();
+
+	// Check goal
+	if (node == endNode)
+	{
+		BuildPath(node);
+		return true;
+	}
+
+	// Connections
+	std::list<Node*> connections = GetConnections(node->posX, node->posY);
+	for (Node* next : connections)
+	{
+		// Connection is in closed list
+		auto it = std::find(closedList.begin(), closedList.end(), next);
+		if (it != closedList.end())
+		{
+			continue;
 		}
 
-		// Connections
-		std::list<Node*> connections = GetConnections(node->posX, node->posY);
-		for (Node* next : connections)
+		// Connection is in open list
+		it = std::find(openList.begin(), openList.end(), next);
+		if (it != openList.end())
 		{
-			// Connection is in closed list
-			auto it = std::find(closedList.begin(), closedList.end(), next);
-			if (it != closedList.end())
-			{
-				continue;
-			}
-
-			// Connection is in open list
-			it = std::find(openList.begin(), openList.end(), next);
-			if (it != openList.end())
-			{
-				// Update cost in open list if smaller
-				float newCost = node->g + next->cost;
-				if (newCost < (*it)->g)
-					(*it)->g = newCost;
-			}
-			// Add to openlist with node as parent
-			else
-			{
-				next->parent = node;
-				next->g = next->cost + node->g;
-				next->f = next->g + Heuristics(next, endNode);
-				openList.push_back(next);
-				closedList.push_back(node);
-			}
+			// Update cost in open list if smaller
+			float newCost = node->g + next->cost;
+			if (newCost < (*it)->g)
+				(*it)->g = newCost;
+		}
+		// Add to openlist with node as parent
+		else
+		{
+			next->parent = node;
+			next->g = next->cost + node->g;
+			next->f = next->g + Heuristics(next, endNode);
+			openList.push_back(next);
+			closedList.push_back(node);
 		}
 	}
 
