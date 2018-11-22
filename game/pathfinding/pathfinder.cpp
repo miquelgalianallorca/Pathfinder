@@ -40,8 +40,13 @@ void Pathfinder::UpdatePath()
 	path.WorldPosToCoord(m_EndPosition.mX, m_EndPosition.mY, squareSize, posX, posY);
 	m_EndPositionCoord = USVec2D(static_cast<float>(posX), static_cast<float>(posY));
 
+	if (!path.IsValidCoord(m_StartPositionCoord) || !path.IsValidCoord(m_EndPositionCoord))
+	{
+		cout << "Invalid coords." << endl;
+		return;
+	}
+
 	// A*
-	// path.AStar(GetStartPosition().mX, GetStartPosition().mY, GetEndPosition().mX, GetEndPosition().mY);
 	path.AStar(m_StartPositionCoord.mX, m_StartPositionCoord.mY,
 		m_EndPositionCoord.mX, m_EndPositionCoord.mY);
 }
@@ -81,11 +86,12 @@ void Pathfinder::DrawDebug()
 // Returns true if pathfinding process finished
 bool Pathfinder::PathfindStep()
 {
+	cout << "Pathfind step." << endl;
+
 	// Optional P6: do it step by step
 	// ...
     return true;
 }
-
 
 void Pathfinder::SetStartPosition(float x, float y)
 {
@@ -100,14 +106,6 @@ void Pathfinder::SetEndPosition(float x, float y)
 	IsEndPositionSet = true;
 	UpdatePath();
 }
-
-
-
-
-
-
-
-
 
 
 //lua configuration ----------------------------------------------------------------//

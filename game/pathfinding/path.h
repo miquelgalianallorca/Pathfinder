@@ -46,6 +46,7 @@ public:
 
 	void DrawDebug(const size_t& squareSize);
 
+	bool IsValidCoord(const USVec2D pos);
 	void CoordToWorldPos(const unsigned int InPosX, const unsigned int InPosY, const size_t squareSize,
 		float& OutPosX, float& OutPosY);
 	void WorldPosToCoord(const float InPosX, const float InPosY, const size_t squareSize, 
@@ -59,10 +60,11 @@ private:
 	
 	static bool OrderByShortest(const Node* first, const Node* second)
 	{
-		return (first->cost < second->cost);
+		return (first->f < second->f);
 	}
+	
 	std::list<Node*> GetConnections(unsigned int posX, unsigned int posY);
-
 	Node* GetNodeAtPosition(unsigned int posX, unsigned int posY);
 	void ResetNodes();
+	float Heuristics(const Node* next, const Node* goal);
 };

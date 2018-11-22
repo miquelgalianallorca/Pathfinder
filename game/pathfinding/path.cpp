@@ -39,6 +39,8 @@ void Path::Load(const std::string& filename, const unsigned int rows, const unsi
 		node->posY = i / cols;
 		node->posX = i % cols;
 		node->parent = nullptr;
+		node->g = 0.f;
+		node->f = 0.f;
 		nodes.push_back(node);
 	}
 }
@@ -90,8 +92,8 @@ bool Path::AStar(const float startX, const float startY, const float endX, const
 	std::list<Node*> closedList;
 
 	// openList.push_back(Node(static_cast<unsigned int>(startX), static_cast<unsigned int>(startY), 0));
-	Node* startNode = GetNodeAtPosition(static_cast<unsigned int>(startX),
-		static_cast<unsigned int>(startY));
+	Node* startNode = GetNodeAtPosition(static_cast<unsigned int>(startX), static_cast<unsigned int>(startY));
+	Node* endNode   = GetNodeAtPosition(static_cast<unsigned int>(endX),   static_cast<unsigned int>(endY));
 	openList.push_back(startNode);
 
 	while (openList.size() > 0)
@@ -125,16 +127,16 @@ bool Path::AStar(const float startX, const float startY, const float endX, const
 			if (it != openList.end())
 			{
 				// Update cost in open list if smaller
-				int newCost = node->cost + next->cost;
-				if (newCost < (*it)->cost)
-				{
-					(*it)->cost = newCost;
-				}
+				float newCost = node->g + next->cost;
+				if (newCost < (*it)->g)
+					(*it)->g = newCost;
 			}
 			// Add to openlist with node as parent
 			else
 			{
 				next->parent = node;
+				next->g = next->cost + node->g;
+				next->f = next->g + Heuristics(next, endNode);
 				openList.push_back(next);
 				closedList.push_back(node);
 			}
@@ -148,6 +150,7 @@ void Path::DrawDebug(const size_t& squareSize)
 {
 	MOAIGfxDevice& gfxDevice = MOAIGfxDevice::Get();
 	
+	// Paint node cost in red
 	for (const Node* node : nodes)
 	{
 		if (node->cost > 0)
@@ -159,6 +162,15 @@ void Path::DrawDebug(const size_t& squareSize)
 			CoordToWorldPos(node->posX, node->posY, squareSize, wPosX, wPosY);
 			MOAIDraw::DrawRectFill(wPosX, wPosY, wPosX + squareSize*2, wPosY + squareSize*2);
 		}
+	}
+
+	// Paint path
+	for (const Node* node : path)
+	{
+		gfxDevice.SetPenColor(.3f, .3f, 0.f, .1f);
+		float wPosX, wPosY;
+		CoordToWorldPos(node->posX, node->posY, squareSize, wPosX, wPosY);
+		MOAIDraw::DrawRectFill(wPosX, wPosY, wPosX + squareSize * 2, wPosY + squareSize * 2);
 	}
 }
 
@@ -220,6 +232,8 @@ void Path::BuildPath(Node* node)
 		path.push_back(node);
 		node = node->parent;
 	}
+	path.push_back(node);
+
 	cout << "Path built." << endl;
 }
 
@@ -232,6 +246,23 @@ Node* Path::GetNodeAtPosition(unsigned int posX, unsigned int posY)
 			return node;
 		}
 	}
-
 	return nullptr;
+}
+
+float Path::Heuristics(const Node* next, const Node* goal)
+{
+	USVec2D nextPos = USVec2D(next->posX, next->posY);
+	USVec2D goalPos = USVec2D(goal->posX, goal->posY);
+
+	return nextPos.Dist(goalPos);
+}
+
+bool Path::IsValidCoord(const USVec2D pos)
+{
+	unsigned int x = static_cast<unsigned int>(pos.mX);
+	unsigned int y = static_cast<unsigned int>(pos.mY);
+	if (x >= 0 && x < cols && y >= 0 && y < rows)
+		return true;
+	else
+		return false;
 }
