@@ -87,7 +87,7 @@ void Pathfinder::DrawDebug()
 bool Pathfinder::PathfindStep()
 {
 	// Single iteration of A* loop
-	// path.AStarStep();
+	path.AStarStep();
 
 	return true;
 }

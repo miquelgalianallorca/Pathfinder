@@ -24,7 +24,8 @@ class Path
 public:
 	Path() :
 		rows(0),
-		cols(0)
+		cols(0),
+		isStepByStepModeOn(true)
 	{}
 
 	~Path();
@@ -58,6 +59,9 @@ private:
 	std::list<Node*> path;
 	Node* startNode;
 	Node* endNode;
+
+	// false: P1 - true: P2
+	bool isStepByStepModeOn;
 	
 	// Helper functions ----------------------------------------------------
 	static bool OrderByShortest(const Node* first, const Node* second)

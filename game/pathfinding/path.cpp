@@ -54,6 +54,7 @@ void Path::ResetNodes()
 		node->f = 0.f;
 	}
 
+	path.clear();
 	openList.clear();
 	closedList.clear();
 }
@@ -91,11 +92,14 @@ bool Path::AStar(const float startX, const float startY, const float endX, const
 	endNode   = GetNodeAtPosition(static_cast<unsigned int>(endX),   static_cast<unsigned int>(endY));
 	openList.push_back(startNode);
 
-	while (openList.size() > 0)
+	if (!isStepByStepModeOn)
 	{
-		bool Step = AStarStep();
-		if (Step)
-			return true;
+		while (openList.size() > 0)
+		{
+			bool Step = AStarStep();
+			if (Step)
+				return true;
+		}
 	}
 
 	return false;
@@ -106,8 +110,7 @@ bool Path::AStarStep()
 	// Get shortest
 	openList.sort(Path::OrderByShortest);
 	Node* node = openList.front();
-	openList.pop_front();
-
+	
 	// Check goal
 	if (node == endNode)
 	{
@@ -115,6 +118,8 @@ bool Path::AStarStep()
 		return true;
 	}
 
+	openList.pop_front();
+	
 	// Connections
 	std::list<Node*> connections = GetConnections(node->posX, node->posY);
 	for (Node* next : connections)
@@ -133,7 +138,10 @@ bool Path::AStarStep()
 			// Update cost in open list if smaller
 			float newCost = node->g + next->cost;
 			if (newCost < (*it)->g)
+			{
 				(*it)->g = newCost;
+				(*it)->parent = node;
+			}
 		}
 		// Add to openlist with node as parent
 		else
@@ -165,15 +173,38 @@ void Path::DrawDebug(const size_t& squareSize)
 			CoordToWorldPos(node->posX, node->posY, squareSize, wPosX, wPosY);
 			MOAIDraw::DrawRectFill(wPosX, wPosY, wPosX + squareSize*2, wPosY + squareSize*2);
 		}
-	}
+	}	
 
-	// Paint path
-	for (const Node* node : path)
+	// Paint A*
+	if (isStepByStepModeOn)
 	{
-		gfxDevice.SetPenColor(.3f, .3f, 0.f, .1f);
-		float wPosX, wPosY;
-		CoordToWorldPos(node->posX, node->posY, squareSize, wPosX, wPosY);
-		MOAIDraw::DrawRectFill(wPosX, wPosY, wPosX + squareSize * 2, wPosY + squareSize * 2);
+		// Paint open nodes
+		for (const Node* node : openList)
+		{
+			gfxDevice.SetPenColor(0.f, 0.f, .3f, .1f);
+			float wPosX, wPosY;
+			CoordToWorldPos(node->posX, node->posY, squareSize, wPosX, wPosY);
+			MOAIDraw::DrawRectFill(wPosX, wPosY, wPosX + squareSize * 2, wPosY + squareSize * 2);
+		}
+		// Paint close nodes
+		for (const Node* node : closedList)
+		{
+			gfxDevice.SetPenColor(0.f, 0.3f, 0.f, .1f);
+			float wPosX, wPosY;
+			CoordToWorldPos(node->posX, node->posY, squareSize, wPosX, wPosY);
+			MOAIDraw::DrawRectFill(wPosX, wPosY, wPosX + squareSize * 2, wPosY + squareSize * 2);
+		}
+	}
+	else
+	{
+		// Paint path
+		for (const Node* node : path)
+		{
+			gfxDevice.SetPenColor(.3f, .3f, 0.f, .1f);
+			float wPosX, wPosY;
+			CoordToWorldPos(node->posX, node->posY, squareSize, wPosX, wPosY);
+			MOAIDraw::DrawRectFill(wPosX, wPosY, wPosX + squareSize * 2, wPosY + squareSize * 2);
+		}
 	}
 }
 
