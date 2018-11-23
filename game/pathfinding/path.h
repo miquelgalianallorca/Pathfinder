@@ -25,7 +25,7 @@ public:
 	Path() :
 		rows(0),
 		cols(0),
-		isStepByStepModeOn(true)
+		isStepByStepModeOn(false)
 	{}
 
 	~Path();
