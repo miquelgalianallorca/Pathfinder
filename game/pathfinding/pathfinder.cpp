@@ -126,8 +126,8 @@ int Pathfinder::_setStartPosition(lua_State* L)
 {
 	MOAI_LUA_SETUP(Pathfinder, "U")
 
-	float pX = state.GetValue<float>(2, 0.0f);
-	float pY = state.GetValue<float>(3, 0.0f);
+	const float pX = state.GetValue<float>(2, 0.0f);
+	const float pY = state.GetValue<float>(3, 0.0f);
 	self->SetStartPosition(pX, pY);
 	return 0;
 }
@@ -136,8 +136,8 @@ int Pathfinder::_setEndPosition(lua_State* L)
 {
 	MOAI_LUA_SETUP(Pathfinder, "U")
 
-	float pX = state.GetValue<float>(2, 0.0f);
-	float pY = state.GetValue<float>(3, 0.0f);
+	const float pX = state.GetValue<float>(2, 0.0f);
+	const float pY = state.GetValue<float>(3, 0.0f);
 	self->SetEndPosition(pX, pY);
 	return 0;
 }

@@ -16,10 +16,6 @@ void Path::Load(const std::string& filename, const unsigned int rows, const unsi
 	this->cols = cols;
 
 	// Clear previous nodes
-	for (Node* node : nodes)
-	{
-		delete node;
-	}
 	nodes.clear();
 	
 	// Read file
